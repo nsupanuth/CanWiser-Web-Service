@@ -31,6 +31,6 @@ app.use('/user',require('./routes/user'))
 app.use('/predict',require('./routes/predict'))
 app.use('/retrain',require('./routes/retrain'))
 
-const port = process.env.PORT || 3000
+const port = 3000
 
 app.listen(port)

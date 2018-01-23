@@ -42,11 +42,12 @@ router.post('/upload',photoMiddleware,(req,res) => {
             filename : newfilename
         }
     
+        var jsonResult = null
         pyshell.send(JSON.stringify(fileInfo))
         pyshell.on('message',function(message){
-            console.log(message)
+            jsonResult = JSON.parse(message)
             res.json({
-                features : message,
+                results : jsonResult,
                 status : 'success'
             })
         })
