@@ -1,14 +1,21 @@
 import sys,json
+import time
+
 import numpy as np
 import pandas as pd
 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.feature_selection import SelectFromModel
+
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import tree
 
 from sklearn import metrics
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix
+
+from sklearn.externals import joblib
 
 # For using SMOTE 
 from imblearn.over_sampling import SMOTE
@@ -40,9 +47,6 @@ def main():
         if feature > 0.1:
             selectedFeatures.append(features[count])
         count = count + 1
-    
-    #print(selectedFeatures)
-    #print(filePath)
 
     # Classification Model
     features = selectedFeatures
@@ -62,18 +66,54 @@ def main():
     sm = SMOTE(random_state=12,k_neighbors = 5)
     x_train_res, y_train_res = sm.fit_sample(train_x, train_y)
 
-    #decision Tree
+    #Decision Tree
     model_dtree = tree.DecisionTreeClassifier(max_depth = 5)
     model_dtree.fit(x_train_res, y_train_res)
-    prediction = model_dtree.predict(test_x)
+    prediction__dtree = model_dtree.predict(test_x)
+    f1_dtree = f1_score(test_y, prediction__dtree, average='macro')
+
+    #SVM
+    model_svm = SVC()
+    model_svm.fit(x_train_res, y_train_res)
+    prediction_svm = model_svm.predict(test_x)
+    f1_svm = f1_score(test_y, prediction_svm, average='macro')
+
+    #Random forest
+    model_rdf =RandomForestClassifier(n_estimators=10)
+    model_rdf.fit(x_train_res,y_train_res)
+    prediction_rdf = model_rdf.predict(test_x)
+    f1_rdf = f1_score(test_y, prediction_rdf, average='macro')
+
+    # Model Selection
+    f1 = 0
+    selectedModelName = ''
+    selectedModel = ''
+    if f1_dtree > f1:
+        f1 = f1_dtree
+        prediction = prediction__dtree
+        selectedModelName = 'Decision Tree'
+        selectedModel = model_dtree
+    if f1_svm > f1 :
+        f1 = f1_svm
+        prediction = prediction_svm
+        selectedModelName = 'SVM'
+        selectedModel = model_svm
+    if f1_rdf > f1 :
+        f1 = f1_rdf
+        prediction = prediction_rdf
+        selectedModelName = 'Random forest'
+        selectedModel = model_rdf
 
     result = {
         "features" : features,
-        "Model" : "Decision Tree",
-        "Accuracy" : metrics.accuracy_score(prediction,test_y),
-        "Recall" : recall_score(test_y, prediction, average='macro'),
-        "F1" : f1_score(test_y, prediction, average='macro')
+        "modelName" : selectedModelName,
+        "modelPath" : './src/predictivemodels/'+selectedModelName+'_'+time.strftime("%Y-%m-%d %H:%M")+'.pkl',
+        "accuracy" : metrics.accuracy_score(prediction,test_y),
+        "recall" : recall_score(test_y, prediction, average='macro'),
+        "f1" : f1_score(test_y, prediction, average='macro')
     }
+
+    joblib.dump(selectedModel,result["modelPath"], compress=9)
 
     print(json.dumps(result))
 

@@ -6,7 +6,8 @@ app = express()
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
-const connectionUri = 'mysql://root:supanuth@localhost/CanWiser'
+//const connectionUri = 'mysql://root:supanuth@localhost/CanWiser'
+const connectionUri = 'mysql://nsupanuth:supanuth@ec2-54-169-53-185.ap-southeast-1.compute.amazonaws.com/CanWiser'
 const sequelize = new Sequelize(connectionUri,databaseOptions)
 
 app.set('sequelize',sequelize)
@@ -14,6 +15,8 @@ app.set('sequelize',sequelize)
 /* import Model */
 const User = require('./models/User.js')()
 const General = require('./models/General.js')()
+const Predictive = require('./models/Predictive.js')()
+
 
 User.hasOne(General,{
     foreignKey : 'patient_no'        

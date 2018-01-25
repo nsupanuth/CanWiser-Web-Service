@@ -4,7 +4,16 @@ const sequelize = app.get('sequelize')
 const PythonShell = require('python-shell')
 
 
-router.get('/user',(req,res) => {
+// router.post('/cholan',(req,res) =>{
+
+//     const pyshell = new PythonShell('./src/pythonsripts/predict.py')
+//     const {  } = req.body
+
+
+
+// })
+
+router.post('/user',(req,res) => {
 
     const pyshell = new PythonShell('./src/pythonscripts/predict.py')
     var predictData = {

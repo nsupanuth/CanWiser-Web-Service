@@ -29,6 +29,9 @@ router.get('/info',async (req,res) => {
     const include = [
         {
             model : General,
+            attributes : {
+                exclude : ['id','patient_no']
+            }
         }
     ]
 
