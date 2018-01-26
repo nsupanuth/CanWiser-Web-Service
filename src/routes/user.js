@@ -4,6 +4,7 @@ const sequelize = app.get('sequelize')
 /* Model */
 const User = sequelize.models['user']
 const General = sequelize.models['general']
+const Physical = sequelize.models['physical']
 
 const Op = sequelize.Op
 
@@ -17,7 +18,6 @@ router.get('/general',async (req,res) => {
         return res.json(result)
     } catch (error) {
         return res.status(500).end()        
-        
     }
 })
 
@@ -32,11 +32,16 @@ router.get('/info',async (req,res) => {
             attributes : {
                 exclude : ['id','patient_no']
             }
+        },
+        {
+            model : Physical,
+            attributes : {
+                exclude : ['patient_no']
+            }
         }
     ]
 
     try {
-      console.log("Info1")            
       const result = await User.findAll({
         include,
         attributes : {
@@ -49,7 +54,7 @@ router.get('/info',async (req,res) => {
       return res.json(result)      
 
     } catch (error) {
-    return res.status(500).end()        
+        return res.status(500).end()        
     }
 
 })

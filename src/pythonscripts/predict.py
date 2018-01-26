@@ -7,9 +7,9 @@ def read_in():
 
 def main():
     data = read_in()
-    model = joblib.load('./src/pythonscripts/predictiveModels/my_model.pkl')
+    model = joblib.load('./src/pythonscripts/predictiveModels/model_dtree.pkl')
     #userPredict = model.predict([[21.46,94.25,0.09444,0.09947,0.2075]])
-    userPredict = model.predict([[data["one"],data["two"],data["three"],data["four"],data["five"]]])
+    userPredict = model.predict([[data["gammaGT"],data["alkPhosphatase"],data["ALT"],data["CEA"],data["CA199"]]])
     print(userPredict[0])
 
 # Start process

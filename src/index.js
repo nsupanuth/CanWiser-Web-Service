@@ -16,12 +16,19 @@ app.set('sequelize',sequelize)
 const User = require('./models/User.js')()
 const General = require('./models/General.js')()
 const Predictive = require('./models/Predictive.js')()
-
+const Physical = require('./models/Physical.js')()
 
 User.hasOne(General,{
     foreignKey : 'patient_no'        
 })
 General.belongsTo(User,{
+    foreignKey : 'patient_no'    
+})
+
+User.hasMany(Physical,{
+    foreignKey : 'patient_no'    
+})
+Physical.belongsTo(User,{
     foreignKey : 'patient_no'    
 })
 
