@@ -8,34 +8,95 @@ const Physical = sequelize.models['physical']
 
 const PythonShell = require('python-shell')
 
-/*
-router.post('/cholan',async (req,res) =>{
 
-    const pyshell = new PythonShell('./src/pythonsripts/predict.py')
-    const { patient_no,gender,age,height,weight,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,
-             phy2_5_vs1,phy8_1_3_vs1,phy5_5_vs1 }  = req.body
+router.post('/test',async (req,res) => {
+
+    const { patient_no,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1 ,phy2_5_vs1 ,phy8_1_3_vs1,phy5_5_vs1 } = req.body
 
     try {
-        const user = await User.findOne({
-            attributes : ['id'],
-            where: {
-                id : patient_no   // use session to store this value in the future
-            }
-        }) 
+        const result = await Physical.create({
+            patient_no,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1 ,phy2_5_vs1 ,phy8_1_3_vs1,phy5_5_vs1
+        })  
+  
+        return res.json(result)
+  
+      } catch (err) {
+        
+        return res.status(500).end()
+      }
 
-        const insertGeneral = await General.Update({
-            patient_no : user.id,
-            gender,
-            age,
-            weight,
-            height,
-            BMI : weight/(height*height)
+})
+
+
+router.post('/test/cholan',async (req,res) => {
+
+    const pyshell = new PythonShell('./src/pythonscripts/predictCholan.py')
+
+    const { patient_no,gender,age,height,weight,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,
+            phy2_5_vs1,phy8_1_3_vs1,phy5_5_vs1,gammaGT,alkPhosphatase,ALT,CEA,
+            CA199  }  = req.body 
+
+    var predictData = { gammaGT, alkPhosphatase,ALT,CEA,CA199 }
+
+    var jsonResult = null
+    var status = null
+    pyshell.send(JSON.stringify(predictData))
+    pyshell.on('message',function(message){
+        console.log(message)
+        jsonResult = JSON.parse(message)
+        
+        res.json({
+            results : jsonResult,
+            status : 'success'
+        })
+    
+    })
+
+    pyshell.end(function (err) {
+        if (err) throw err
+        console.log('finished');
+    });
+
+
+})
+
+
+
+router.post('/cholan',async (req,res) =>{
+
+    // const pyshell = new PythonShell('./src/pythonsripts/predict.py')
+    // const { patient_no,gender,age,height,weight,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,
+    //          phy2_5_vs1,phy8_1_3_vs1,phy5_5_vs1,gammaGT,alkPhosphatase,ALT,CEA,
+    //          CA199  }  = req.body
+
+    const { patient_no,gender,age,height,weight,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,
+            phy2_5_vs1,phy8_1_3_vs1,phy5_5_vs1,gammaGT,alkPhosphatase }  = req.body
+
+    try {
+       
+        const general = await General.findById(patient_no)
+
+        console.log(general.id)
+
+        /* Update general */
+        general.gender = gender
+        general.age = age
+        general.height = height
+        general.weight = weight
+        general.BMI = weight / ((height/100) * (height/100))
+
+        await general.save()
+
+        const insertPhysical = await Physical.create({
+            patient_no : patient_no, // will be replaced with session,
+            phy6_2_5_vs1,
+            phy6_2_12_vs1,
+            phy9_3_6_vs1,
+            phy2_5_vs1,
+            phy8_1_3_vs1,
+            phy5_5_vs1
         })
         
-        const insertPhysical = await Physical.Create({
-            phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,phy2_5_vs1,phy8_1_3_vs1,phy5_5_vs1
-        })
-
         const include = [
             {
                 model : General,
@@ -47,27 +108,40 @@ router.post('/cholan',async (req,res) =>{
                 model : Physical,
                 attributes : {
                     exclude : ['patient_no']
-                }
+                },
+                order : [
+                    [ Physical.created_at, 'DESC']
+                ]
             }
         ]
 
+        /* predict cholan */
+        //executePythonModel(insertPhysical)
 
         const result = await User.findOne({
             include,
-            patient_no : 1 , // will be replaced with session,
+            patient_no : patient_no , // will be replaced with session
             attributes : {
                 exclude : ['password']
             }
         })
 
-        res.json(result)        
-
+        res.json(result)    
+        
     } catch (error) {
         res.status(500).end()
     }
     
 })
-*/
+
+function executePythonModel(data){
+    
+    const pyshell = new PythonShell('./src/pythonscripts/predictCholan.py')
+    
+
+
+}
+
 
 router.post('/user',(req,res) => {
 

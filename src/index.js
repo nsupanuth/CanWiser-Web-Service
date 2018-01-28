@@ -17,7 +17,9 @@ const User = require('./models/User.js')()
 const General = require('./models/General.js')()
 const Predictive = require('./models/Predictive.js')()
 const Physical = require('./models/Physical.js')()
+const Cholan = require('./models/Cholan.js')()
 
+/* Relation between user and general */
 User.hasOne(General,{
     foreignKey : 'patient_no'        
 })
@@ -25,12 +27,23 @@ General.belongsTo(User,{
     foreignKey : 'patient_no'    
 })
 
+/* Relation between user and physical */
 User.hasMany(Physical,{
     foreignKey : 'patient_no'    
 })
 Physical.belongsTo(User,{
     foreignKey : 'patient_no'    
 })
+
+/* Relation between user and cholan */
+User.hasMany(Cholan,{
+    foreignKey : 'patient_no'    
+})
+Cholan.belongsTo(User,{
+    foreignKey : 'patient_no'    
+})
+
+
 
 app.get('/',(req,res) => {
     res.json({})

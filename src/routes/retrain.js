@@ -24,7 +24,6 @@ router.post('/upload/confirm',async (req,res) => {
     const { accuracy,recall,f1,model_name,model_path } = req.body
 
     try {
-        //console.log("Test /upload/confirm")
         const result = await Predictive.create({ accuracy,recall,f1,model_name,model_path })
         return res.json(result)
         
@@ -63,15 +62,7 @@ router.get('/getModel',async (req,res) => {
             ],
        }) 
 
-        //    const insertResult = await Predictive.create({
-        //          accuracy,
-        //          recall,
-        //          f1,
-        //          model_name,
-        //          model_path : result.model_path
-        //    })
-
-        return res.json(result)
+       return res.json(result)
 
     } catch (error) {
         

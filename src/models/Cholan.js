@@ -13,12 +13,8 @@ module.exports = () => {
            type : Sequelize.INTEGER,
            foreignKey : true
         },
-        phy6_2_5_vs1 : Sequelize.DOUBLE,
-        phy6_2_12_vs1 : Sequelize.DOUBLE,
-        phy9_3_6_vs1 : Sequelize.DOUBLE,
-        phy2_5_vs1 : Sequelize.DOUBLE,
-        phy8_1_3_vs1 : Sequelize.DOUBLE,
-        phy5_5_vs1 : Sequelize.DOUBLE
+        Cholan : Sequelize.DOUBLE,
+        Proba : Sequelize.DOUBLE 
     }
 
     const options = {
@@ -29,8 +25,8 @@ module.exports = () => {
         },
     }
 
-    const Physical = sequelize.define('physical',fields, options)
-    //Physical.sync({ force : true })
+    const Cholan = sequelize.define('cholan',fields, options)
+    //Cholan.sync({ force : true })
     
-    return Physical
+    return Cholan
 }
