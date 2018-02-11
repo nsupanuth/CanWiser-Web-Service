@@ -1,4 +1,5 @@
 import sys,json
+import warnings
 import time
 
 import numpy as np
@@ -28,7 +29,8 @@ def main():
     data = read_in()
     filePath = './src/datasets/csv/' + data["filename"]
     data = pd.read_csv(filePath,header = 0)
-    data.drop(['Unnamed: 0'],axis = 1, inplace = True)
+
+    #data.drop(['Unnamed: 0'],axis = 1, inplace = True)
     features = list(data.columns[2:])
     data.drop(['Patient_No'],axis = 1, inplace = True)
     
@@ -72,14 +74,9 @@ def main():
     prediction__dtree = model_dtree.predict(test_x)
     f1_dtree = f1_score(test_y, prediction__dtree, average='macro')
 
-    #SVM
-    model_svm = SVC()
-    model_svm.fit(x_train_res, y_train_res)
-    prediction_svm = model_svm.predict(test_x)
-    f1_svm = f1_score(test_y, prediction_svm, average='macro')
-
+    
     #Random forest
-    model_rdf =RandomForestClassifier(n_estimators=10)
+    model_rdf =RandomForestClassifier(n_estimators=500, max_depth=7)
     model_rdf.fit(x_train_res,y_train_res)
     prediction_rdf = model_rdf.predict(test_x)
     f1_rdf = f1_score(test_y, prediction_rdf, average='macro')
@@ -93,16 +90,13 @@ def main():
         prediction = prediction__dtree
         selectedModelName = 'Decision Tree'
         selectedModel = model_dtree
-    if f1_svm > f1 :
-        f1 = f1_svm
-        prediction = prediction_svm
-        selectedModelName = 'SVM'
-        selectedModel = model_svm
     if f1_rdf > f1 :
         f1 = f1_rdf
         prediction = prediction_rdf
         selectedModelName = 'Random forest'
         selectedModel = model_rdf
+
+    #warnings.filterwarnings('ignore')
 
     result = {
         "features" : features,
@@ -110,7 +104,52 @@ def main():
         "modelPath" : './src/predictivemodels/'+selectedModelName+'_'+time.strftime("%Y-%m-%d %H:%M")+'.pkl',
         "accuracy" : metrics.accuracy_score(prediction,test_y),
         "recall" : recall_score(test_y, prediction, average='macro'),
-        "f1" : f1_score(test_y, prediction, average='macro')
+        "f1" : f1_score(test_y, prediction, average='macro'),
+        "stat" : [
+            {
+                "name" : "mean",
+                "age" : data['Age'].mean(),
+                "BMI" : data['BMI'].mean(),
+                "GammaGT" : data['GammaGT'].mean(),
+                "AlkPhosphatase" : data['Alk.Phosphatase'].mean(),
+                "ALT" : data['ALT'].mean(),
+                "CEA" : data['CEA'].mean(),
+                "CA199" : data['CA199'].mean()
+            },
+            {
+                "name" : "median",
+                "age" : data['Age'].median(),
+                "BMI" : data['BMI'].median(),
+                "GammaGT" : data['GammaGT'].median(),
+                "AlkPhosphatase" : data['Alk.Phosphatase'].median(),
+                "ALT" : data['ALT'].median(),
+                "CEA" : data['CEA'].median(),
+                "CA199" : data['CA199'].median()
+            },
+            {
+                "name" : "max",
+                "age" : data['Age'].max(),
+                "BMI" : data['BMI'].max(),
+                "GammaGT" : data['GammaGT'].max(),
+                "AlkPhosphatase" : data['Alk.Phosphatase'].max(),
+                "ALT" : data['ALT'].max(),
+                "CEA" : data['CEA'].max(),
+                "CA199" : data['CA199'].max()
+            },
+            {
+                "name" : "min",
+                "age" : data['Age'].min(),
+                "BMI" : data['BMI'].min(),
+                "GammaGT" : data['GammaGT'].min(),
+                "AlkPhosphatase" : data['Alk.Phosphatase'].min(),
+                "ALT" : data['ALT'].min(),
+                "CEA" : data['CEA'].min(),
+                "CA199" : data['CA199'].min()
+            }
+           
+        ]
+        
+    
     }
 
     joblib.dump(selectedModel,result["modelPath"], compress=9)

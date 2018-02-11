@@ -2,7 +2,10 @@ const express = require('express')
 const Sequelize = require('sequelize')
 const { databaseOptions,rawQueryOptions } = require('./options')
 
+var cors = require('cors')
+
 app = express()
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
@@ -18,6 +21,8 @@ const General = require('./models/General.js')()
 const Predictive = require('./models/Predictive.js')()
 const Physical = require('./models/Physical.js')()
 const Cholan = require('./models/Cholan.js')()
+const Dashboard = require('./models/Dashboard')()
+const DashboardStat = require('./models/DashboardStat')()
 
 /* Relation between user and general */
 User.hasOne(General,{
@@ -43,16 +48,33 @@ Cholan.belongsTo(User,{
     foreignKey : 'patient_no'    
 })
 
+/* Relation between predictive and dashboardstat eg. mean median max min*/
+Predictive.hasOne(DashboardStat,{
+    foreignKey : 'predictive_no'    
+})
+DashboardStat.belongsTo(Predictive,{
+    foreignKey : 'predictive_no'    
+})
 
+
+/**
+ * For Authentication
+ */
+const jwtAuth = require('./middlewares/jwt-auth')
 
 app.get('/',(req,res) => {
-    res.json({})
+    res.json([])
 })
+
+//app.use(require('./routes/auth'))
 
 /* router */
 app.use('/user',require('./routes/user'))
 app.use('/predict',require('./routes/predict'))
 app.use('/retrain',require('./routes/retrain'))
+app.use('/dashboard',require('./routes/dashboard'))
+app.use('/dashboard/stat',require('./routes/dashboardStat'))
+
 
 const port = 3000
 

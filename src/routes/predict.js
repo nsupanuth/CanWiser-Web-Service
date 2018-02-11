@@ -6,7 +6,44 @@ const User = sequelize.models['user']
 const General = sequelize.models['general']
 const Physical = sequelize.models['physical']
 
+const Predictive = sequelize.models['predictive']
+const DashboardStat = sequelize.models['dashboardstat']
+
 const PythonShell = require('python-shell')
+
+
+router.get('/info', async (req,res) => {
+
+    try {
+        const include = [
+            {
+                model : DashboardStat,
+                attributes : {
+                    exclude : ['id','predictive_no']
+                }
+            }
+        ]
+
+        const result = await Predictive.findOne({
+            include,
+            order: [
+                ['id', 'DESC'],
+            ]    
+        })
+
+
+        
+    
+        return res.json(result)
+
+    } catch (error) {
+        
+        res.status(500).end()
+
+    }
+    
+
+})
 
 
 router.post('/test',async (req,res) => {
@@ -28,6 +65,9 @@ router.post('/test',async (req,res) => {
 })
 
 
+
+
+
 router.post('/test/cholan',async (req,res) => {
 
     const pyshell = new PythonShell('./src/pythonscripts/predictCholan.py')
@@ -44,7 +84,7 @@ router.post('/test/cholan',async (req,res) => {
     pyshell.on('message',function(message){
         console.log(message)
         jsonResult = JSON.parse(message)
-        
+
         res.json({
             results : jsonResult,
             status : 'success'
@@ -110,7 +150,7 @@ router.post('/cholan',async (req,res) =>{
                     exclude : ['patient_no']
                 },
                 order : [
-                    [ Physical.created_at, 'DESC']
+                    [Physical,'id','DESC']
                 ]
             }
         ]
