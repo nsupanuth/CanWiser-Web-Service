@@ -66,7 +66,7 @@ app.get('/',(req,res) => {
     res.json([])
 })
 
-//app.use(require('./routes/auth'))
+app.use(require('./routes/auth'))
 
 /* router */
 app.use('/user',require('./routes/user'))

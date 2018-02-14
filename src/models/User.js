@@ -13,7 +13,8 @@ module.exports = () => {
         password :  Sequelize.STRING,
         first_name :  Sequelize.STRING,
         last_name :  Sequelize.STRING,
-        gender : Sequelize.BOOLEAN
+        gender : Sequelize.BOOLEAN,
+        role : Sequelize.STRING
     }
 
     const options = {
