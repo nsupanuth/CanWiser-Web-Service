@@ -1,6 +1,10 @@
 const router = require('express').Router()
 const sequelize = app.get('sequelize')
 
+var moment = require('moment');
+//require('moment/locale/cs');
+
+
 /* Model */
 const Dashboard = sequelize.models['dashboard']
 
@@ -28,7 +32,8 @@ router.get('/info',async (req,res) => {
             gender : [
                 {name : 'Male',value : dashboardDBResult.num_of_male },
                 {name : 'Female',value : dashboardDBResult.num_of_female}
-            ]
+            ],
+            date : moment(dashboardDBResult.created_at).calendar()
         }
 
 
@@ -45,7 +50,7 @@ var jsonResult = ''
 
 router.post('/dataset/update',async (req,res) => {
 
-    
+
 
     const pyshell = new PythonShell('./src/pythonscripts/dashboardInfo.py')
        
