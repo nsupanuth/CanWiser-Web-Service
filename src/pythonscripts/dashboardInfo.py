@@ -3,7 +3,10 @@ import numpy as np
 import pandas as pd
 
 def main():
-    data = pd.read_csv('./src/datasets/csv/Final_mixed_data.csv',header=0)
+    fileInfo = json.loads(lines[0])
+    filePath = fileInfo["filePath"]
+    #data = pd.read_csv('./src/datasets/csv/Final_mixed_data.csv',header=0)
+    data = pd.read_csv(filePath,header=0)
 
     age_0_15_non_cholan = len(data[(data["Age"] >=0) & (data["Age"] <= 15) & (data["Cholan"] == 0)])
     age_0_15_cholan = len(data[(data["Age"] >=0) & (data["Age"] <= 15) & (data["Cholan"] == 1)])
@@ -20,8 +23,8 @@ def main():
     age_70_plus_non_cholan = len(data[(data["Age"] >=70) & (data["Cholan"] == 0)])
     age_70_plus_cholan = len(data[(data["Age"] >=70) & (data["Cholan"] == 1)])
 
-    num_of_male = len(data[data['Gender'] == 1])
-    num_of_female = len(data[data['Gender'] == 0])
+    num_of_male = len(data[(data["Gender"] == 1) & (data["Cholan"] == 1)]))
+    num_of_female = len(data[(data["Gender"] == 2) & (data["Cholan"] == 1)]))
 
     result = {
         "age_0_15_non_cholan" :  age_0_15_non_cholan,

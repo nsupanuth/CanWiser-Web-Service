@@ -4,6 +4,7 @@ const sequelize = app.get('sequelize')
 const PythonShell = require('python-shell')
 
 const Predictive = sequelize.models['predictive']
+const Dashboard = sequelize.models['dashboard']
 const DashboardStat = sequelize.models['dashboardstat']
 const Op = sequelize.Op
 
@@ -22,10 +23,24 @@ const photoMiddleware = uploader.single('xxx')  //name on React (HTML)
 
 router.post('/upload/confirm',async (req,res) => {
 
-    const { accuracy,recall,f1,model_name,model_path,stat } = req.body
+    const { accuracy,recall,filePath,f1,model_name,model_path,stat,dashboard } = req.body
 
     try {
-        const result = await Predictive.create({ accuracy,recall,f1,model_name,model_path })
+        const result = await Predictive.create({ accuracy,filePath,recall,f1,model_name,model_path })
+        const dashboardInfo = await Dashboard.create({
+            "age_16_30_cholan": dashboard.age_16_30_cholan,
+            "age_31_50_cholan": dashboard.age_31_50_cholan,
+            "age_51_70_non_cholan": dashboard.age_51_70_non_cholan,
+            "num_of_male": dashboard.num_of_male,
+            "age_70_plus_cholan": dashboard.age_70_plus_cholan,
+            "age_31_50_non_cholan": dashboard.age_31_50_non_cholan,
+            "age_0_15_non_cholan": dashboard.age_0_15_non_cholan,
+            "age_51_70_cholan": dashboard.age_51_70_cholan,
+            "num_of_female": dashboard.num_of_female,
+            "age_0_15_cholan": dashboard.age_0_15_cholan,
+            "age_70_plus_non_cholan": dashboard.age_70_plus_non_cholan,
+            "age_16_30_non_cholan": dashboard.age_16_30_non_cholan
+        })
         const dashboardStat = await DashboardStat.create({
             predictive_no : result.id,
             age_mean : stat[0].age,
@@ -58,9 +73,8 @@ router.post('/upload/confirm',async (req,res) => {
             CA199_min : stat[3].CA199,
 
         })
-            
-        
 
+    
         return res.json({status : 'success'})
         
     } catch (err) {

@@ -9,6 +9,7 @@ module.exports = () => {
           primaryKey : true,
           autoIncrement : true
         },
+        filePath : Sequelize.STRING,
         accuracy : Sequelize.DOUBLE,
         recall : Sequelize.DOUBLE,
         f1 : Sequelize.DOUBLE,
