@@ -65,6 +65,49 @@ router.post('/test',async (req,res) => {
 })
 
 
+router.post('/test/clustering',async (req,res) => {
+
+    const pyshell = new PythonShell('./src/pythonscripts/clustering.py')
+
+    const { Gender,Age,weight,height,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,phy2_5_vs1,phy8_1_3_vs1,
+             phy5_5_vs1 }  = req.body 
+    
+    const BMI = weight/((height/100)*(height/100))
+    console.log("BMI = "+BMI)
+    
+    const predictData = {
+                            Gender,
+                            Age,
+                            BMI,
+                            phy6_2_5_vs1,
+                            phy6_2_12_vs1,
+                            phy9_3_6_vs1,
+                            phy2_5_vs1,
+                            phy8_1_3_vs1,
+                            phy5_5_vs1
+                        }   
+    
+    console.log(predictData)
+
+    var jsonResult = null
+    var status = null
+    pyshell.send(JSON.stringify(predictData))
+    console.log("Test Clustering")
+    pyshell.on('message',function(message){
+        console.log(message)
+        jsonResult = JSON.parse(message)
+        res.json({
+            results : jsonResult,
+            status : 'success'
+        })
+    })
+
+    pyshell.end(function (err) {
+        if (err) throw err
+        console.log('finished');
+    });
+
+})
 
 
 

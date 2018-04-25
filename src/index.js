@@ -10,7 +10,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
 //const connectionUri = 'mysql://root:supanuth@localhost/CanWiser'
-const connectionUri = 'mysql://nsupanuth:supanuth@ec2-54-169-53-185.ap-southeast-1.compute.amazonaws.com/CanWiser'
+const connectionUri = 'mysql://nsupanuth:supanuth@ec2-54-255-222-12.ap-southeast-1.compute.amazonaws.com/CanWiser'
 const sequelize = new Sequelize(connectionUri,databaseOptions)
 
 app.set('sequelize',sequelize)
