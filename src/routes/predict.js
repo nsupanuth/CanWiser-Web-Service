@@ -69,15 +69,15 @@ router.post('/test/clustering',async (req,res) => {
 
     const pyshell = new PythonShell('./src/pythonscripts/clustering.py')
 
-    const { Gender,Age,weight,height,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,phy2_5_vs1,phy8_1_3_vs1,
+    const { gender,age,weight,height,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,phy2_5_vs1,phy8_1_3_vs1,
              phy5_5_vs1 }  = req.body 
     
     const BMI = weight/((height/100)*(height/100))
     console.log("BMI = "+BMI)
-    
+
     const predictData = {
-                            Gender,
-                            Age,
+                            gender,
+                            age,
                             BMI,
                             phy6_2_5_vs1,
                             phy6_2_12_vs1,

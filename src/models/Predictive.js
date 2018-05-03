@@ -14,7 +14,8 @@ module.exports = () => {
         recall : Sequelize.DOUBLE,
         f1 : Sequelize.DOUBLE,
         model_name : Sequelize.STRING,
-        model_path : Sequelize.STRING
+        model_path : Sequelize.STRING,
+        features : Sequelize.STRING
     }
 
     const options = {

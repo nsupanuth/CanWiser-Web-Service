@@ -29,8 +29,8 @@ def main():
     #predict_result = kmeans_model.predict([[1,37,25.4,1,0,1,20,1,0]])[0]
 
     predict_result = kmeans_model.predict([[
-                                            js_data["Gender"],
-                                            js_data["Age"],
+                                            js_data["gender"],
+                                            js_data["age"],
                                             js_data["BMI"],
                                             js_data["phy6_2_5_vs1"],
                                             js_data["phy6_2_12_vs1"],
@@ -39,7 +39,7 @@ def main():
                                             js_data["phy8_1_3_vs1"],
                                             js_data["phy5_5_vs1"]
                                         ]])[0] 
-                                        
+
     df_recommend = data_result[data_result["cluster"] == predict_result].sample(n=2)
     json_recommend = df_recommend.to_json(orient='records')
     

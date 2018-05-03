@@ -23,10 +23,12 @@ const photoMiddleware = uploader.single('xxx')  //name on React (HTML)
 
 router.post('/upload/confirm',async (req,res) => {
 
-    const { accuracy,recall,filePath,f1,model_name,model_path,stat,dashboard } = req.body
+    const { accuracy,recall,filePath,f1,model_name,model_path,stat,dashboard,features } = req.body
+
+    const features_string = features.toString()
 
     try {
-        const result = await Predictive.create({ accuracy,filePath,recall,f1,model_name,model_path })
+        const result = await Predictive.create({ accuracy,filePath,recall,f1,model_name,model_path,features : features_string })
         const dashboardInfo = await Dashboard.create({
             "age_16_30_cholan": dashboard.age_16_30_cholan,
             "age_31_50_cholan": dashboard.age_31_50_cholan,
