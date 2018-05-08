@@ -31,8 +31,8 @@ router.get('/info', async (req,res) => {
             ]    
         })
 
-
-        
+        /* To change features to array*/
+        result.features = result.features.split(",")
     
         return res.json(result)
 
@@ -42,7 +42,6 @@ router.get('/info', async (req,res) => {
 
     }
     
-
 })
 
 
@@ -64,6 +63,66 @@ router.post('/test',async (req,res) => {
 
 })
 
+
+router.post('/adaptive/cholan',async (req,res) => {
+
+    const pyshell = new PythonShell('./src/pythonscripts/predictAdaptive.py')
+
+
+    try {
+
+        const { patient_no,gender,age,height,weight,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,
+                phy2_5_vs1,phy8_1_3_vs1,phy5_5_vs1,gammaGT,alkPhosphatase,ALT,CEA,
+                CA199  }  = req.body 
+    
+        var predictData = { patient_no,gender,age,height,weight,phy6_2_5_vs1,phy6_2_12_vs1,phy9_3_6_vs1,
+                            phy2_5_vs1,phy8_1_3_vs1,phy5_5_vs1,gammaGT,alkPhosphatase,ALT,CEA,
+                            CA199  }
+       
+        const modelResult = await Predictive.findOne({
+            order: [
+                ['id', 'DESC'],
+            ],
+            attributes : [
+               'model_name','model_path','features'
+            ]    
+        })
+
+        /* To change features to array*/
+        modelResult.features = modelResult.features.split(",")
+        
+        const result = {
+            predictData,
+            modelResult
+        }
+
+        //return res.json(result)
+        pyshell.send(JSON.stringify(result))
+        pyshell.on('message',function(message){
+            console.log(message)
+            jsonResult = JSON.parse(message)
+            res.json({
+                results : jsonResult,
+                status : 'success'
+            })           
+        })
+
+        pyshell.end(function (err) {
+            if (err) throw err
+            console.log('finished');
+        });
+    
+
+    } catch (error) {
+        
+        res.status(500).end()
+
+    }
+    
+
+
+
+})
 
 router.post('/test/clustering',async (req,res) => {
 
