@@ -168,8 +168,7 @@ router.post('/test/clustering',async (req,res) => {
 
 })
 
-
-
+/* For decision Tree "FIXED" model */
 router.post('/test/cholan',async (req,res) => {
 
     const pyshell = new PythonShell('./src/pythonscripts/predictCholan.py')
