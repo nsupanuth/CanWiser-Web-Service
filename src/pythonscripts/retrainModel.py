@@ -114,6 +114,7 @@ def main():
         selectedModelName = 'Random forest'
         selectedModel = model_rdf
 
+    cm = confusion_matrix(test_y, prediction)
     #warnings.filterwarnings('ignore')
 
     result = {
@@ -124,6 +125,12 @@ def main():
         "accuracy" : metrics.accuracy_score(prediction,test_y),
         "recall" : recall_score(test_y, prediction, average='macro'),
         "f1" : f1_score(test_y, prediction, average='macro'),
+        "confusion_matrix" : {
+            "tn" : cm[0][0],
+            "fp" : cm[0][1],
+            "fn" : cm[1][0],
+            "tp" : cm[1][1]
+        },
         "dashboard" : {
             "age_0_15_non_cholan" :  age_0_15_non_cholan,
             "age_0_15_cholan" : age_0_15_cholan,
