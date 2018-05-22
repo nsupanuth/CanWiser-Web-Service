@@ -28,7 +28,8 @@ router.post('/login',async (req,res) => {
         const result = {
             token : token,
             username : user.username,
-            role : user.role
+            role : user.role,
+            picture : user.picture
         }
 
         // return res.json({token : token})    

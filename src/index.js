@@ -1,5 +1,6 @@
 const express = require('express')
 const Sequelize = require('sequelize')
+const path = require('path')
 const { databaseOptions,rawQueryOptions } = require('./options')
 
 var cors = require('cors')
@@ -55,6 +56,9 @@ Predictive.hasOne(DashboardStat,{
 DashboardStat.belongsTo(Predictive,{
     foreignKey : 'predictive_no'    
 })
+
+
+app.use("/public", express.static(path.resolve(__dirname, '../public')));
 
 
 /**

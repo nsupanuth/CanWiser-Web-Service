@@ -14,7 +14,8 @@ module.exports = () => {
         first_name :  Sequelize.STRING,
         last_name :  Sequelize.STRING,
         gender : Sequelize.BOOLEAN,
-        role : Sequelize.STRING
+        role : Sequelize.STRING,
+        picture : Sequelize.STRING
     }
 
     const options = {
