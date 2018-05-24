@@ -12,6 +12,7 @@ from sklearn.feature_selection import SelectFromModel
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import tree
+from sklearn.naive_bayes import GaussianNB
 
 from sklearn import metrics
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix
@@ -68,7 +69,12 @@ def main():
             selectedFeatures.append(features[count])
         count = count + 1
 
+
     # Classification Model
+    model_list = list()
+    spec_list = list()
+    f1_list = list()
+
     features = selectedFeatures
     dataCholan = data[data['Cholan'] == 1]
     dataNonCholan = data[data['Cholan'] == 0]
@@ -86,33 +92,95 @@ def main():
     sm = SMOTE(random_state=12,k_neighbors = 5)
     x_train_res, y_train_res = sm.fit_sample(train_x, train_y)
 
-    #Decision Tree
-    model_dtree = tree.DecisionTreeClassifier(max_depth = 5)
-    model_dtree.fit(x_train_res, y_train_res)
-    prediction__dtree = model_dtree.predict(test_x)
-    f1_dtree = f1_score(test_y, prediction__dtree, average='macro')
-
-    
     #Random forest
     model_rdf =RandomForestClassifier(n_estimators=500, max_depth=7)
     model_rdf.fit(x_train_res,y_train_res)
     prediction_rdf = model_rdf.predict(test_x)
     f1_rdf = f1_score(test_y, prediction_rdf, average='macro')
+    cm = confusion_matrix(test_y, prediction_rdf)
+    tn = cm[0][0]
+    fp = cm[0][1]
+    fn = cm[1][0]
+    tp = cm[1][1]
+    spec_rdf = float(tp)/float(tp+fn)
+    model_list.append("Random forest")
+    spec_list.append(spec_rdf)
+    f1_list.append(f1_rdf)
 
-    # Model Selection
-    f1 = 0
-    selectedModelName = ''
-    selectedModel = ''
-    if f1_dtree > f1:
-        f1 = f1_dtree
-        prediction = prediction__dtree
-        selectedModelName = 'Decision Tree'
-        selectedModel = model_dtree
-    if f1_rdf > f1 :
-        f1 = f1_rdf
-        prediction = prediction_rdf
-        selectedModelName = 'Random forest'
+    #Decision Tree
+    model_dtree = tree.DecisionTreeClassifier(max_depth = 5)
+    model_dtree.fit(x_train_res, y_train_res)
+    prediction__dtree = model_dtree.predict(test_x)
+    f1_dtree = f1_score(test_y, prediction__dtree, average='macro')
+    cm = confusion_matrix(test_y, prediction__dtree)
+    tn = cm[0][0]
+    fp = cm[0][1]
+    fn = cm[1][0]
+    tp = cm[1][1]
+    spec_dtree = float(tp)/float(tp+fn)
+    model_list.append("Decision Tree")
+    spec_list.append(spec_dtree)
+    f1_list.append(f1_dtree)
+
+    #SVM
+    # model_svm = SVC(probability=True)
+    # model_svm.fit(x_train_res, y_train_res)
+    # prediction = model_svm.predict(test_x)
+    # f1_svm = f1_score(test_y, prediction, average='macro')
+    # cm = confusion_matrix(test_y, prediction)
+    # tn = cm[0][0]
+    # fp = cm[0][1]
+    # fn = cm[1][0]
+    # tp = cm[1][1]
+    # spec_svm = float(tp)/float(tp+fn)
+    # model_list.append("SVM")
+    # spec_list.append(spec_svm)
+    # f1_list.append(f1_svm)
+
+    #Naive Bayes
+    # model_naive = GaussianNB()
+    # model_naive.fit(x_train_res,y_train_res)
+    # prediction__nvb = model_naive.predict(test_x)
+    # f1_naive = f1_score(test_y, prediction__nvb, average='macro')
+    # cm = confusion_matrix(test_y, prediction__nvb)
+    # tn = cm[0][0]
+    # fp = cm[0][1]
+    # fn = cm[1][0]
+    # tp = cm[1][1]
+    # spec_naive = float(tp)/float(tp+fn)
+    # model_list.append("Naive Baye")
+    # spec_list.append(spec_naive)
+    # f1_list.append(f1_naive)
+
+    max_val = max(spec_list)
+    i = 0
+    max_ind = []
+    for val in spec_list:
+        if val == max_val:
+            max_ind.append(i)
+        i = i + 1
+
+    i = 0
+    maxf1 = 0
+    max_index = 0
+    for val in max_ind:
+        if f1_list[val] > maxf1:
+            maxf1 = f1_list[val]
+            max_index = val
+        
+    selectedModelName = model_list[max_index]
+
+    if model_list[max_index] == 'Random forest':
         selectedModel = model_rdf
+        prediction = prediction_rdf
+    elif model_list[max_index] == 'Decision Tree':
+        selectedModel = model_dtree
+        prediction = prediction__dtree
+    elif model_list[max_index] == 'SVM':
+        selectedModel = model_svm
+    elif model_list[max_index] == 'Naive Baye':
+        selectedModel = model_naive
+        prediction = prediction__nvb
 
     cm = confusion_matrix(test_y, prediction)
     #warnings.filterwarnings('ignore')

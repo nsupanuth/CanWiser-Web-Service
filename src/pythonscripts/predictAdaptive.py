@@ -20,7 +20,9 @@ def main():
     automated_list = list()
     for i in range(len_feature):
         #print(features[i])
-        if features[i] == 'BMI':
+        if features[i] == 'Age':
+            automated_list.append(data["predictData"]["age"])
+        elif features[i] == 'BMI':
             automated_list.append(BMI)
         elif features[i] == 'phy6_2_5_vs1':
             automated_list.append(data["predictData"]["phy6_2_5_vs1"])
