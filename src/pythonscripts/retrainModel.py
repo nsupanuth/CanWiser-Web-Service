@@ -5,6 +5,8 @@ import time
 import numpy as np
 import pandas as pd
 
+import scipy.stats as stats
+
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.feature_selection import SelectFromModel
@@ -56,26 +58,62 @@ def main():
     train_x = data[features]
     train_y = data.Cholan
 
-    # Feature Selection
+    # New feature selection (oddsratio for categorical data)
+    dataBehavior = data[['phy6_2_5_vs1','phy6_2_12_vs1','phy9_3_6_vs1','phy8_1_3_vs1','Cholan']]
+    behaviorFeatureList = list()
+    for column in dataBehavior.columns[0:len(dataBehavior.columns)-1]:
+        P_Cholan = len(dataBehavior[(dataBehavior[column] == 1.0) & (dataBehavior['Cholan'] == 1.0)].index)
+        P_NonCholan = len(dataBehavior[(dataBehavior[column] == 1.0) & (dataBehavior['Cholan'] != 1.0)].index)
+        N_Cholan = len(dataBehavior[(dataBehavior[column] == 0.0) & (dataBehavior['Cholan'] == 1.0)].index)
+        N_NonCholan = len(dataBehavior[(dataBehavior[column] == 0.0) & (dataBehavior['Cholan'] != 1.0)].index)
+        d = {'Cholan': [P_Cholan, N_Cholan], 'Non_Cholan': [P_NonCholan, N_NonCholan]}
+        result = pd.DataFrame(data=d)
+        oddsratio, pvalue = stats.fisher_exact([[P_Cholan, N_Cholan], [P_NonCholan, N_NonCholan]])
+        if (oddsratio > 0) & (pvalue < 0.05):
+            behaviorFeatureList.append(column)
+
+    selectedFeatures = list()
+
+    #selectedFeatures.extend(['GammaGT','Alk.Phosphatase','ALT','CEA','CA199'])   
+
+    selectedFeatures.extend(behaviorFeatureList)
+    
+    #Mann-Whitney u test
+    data_lab_cholan = data[data['Cholan'] == 1]
+    data_lab_noncholan = data[data['Cholan'] == 0]
+    
+    labFeatures = ["GammaGT","Alk.Phosphatase","ALT","CEA","CA199"]
+    
+    for labfeature in labFeatures:
+        data_cholan = data_lab_cholan[labfeature]
+        data_noncholan = data_lab_noncholan[labfeature]
+        mann_result = stats.mannwhitneyu(data_cholan , data_noncholan)
+        if mann_result.pvalue < 0.05:
+            selectedFeatures.append(labfeature)
+    
+    train_x = data[selectedFeatures]
+    train_y = data.Cholan
+
+    # Scan with information gain
     clf = ExtraTreesClassifier()
     clf = clf.fit(train_x,train_y)
 
-    # Information Gain
+    #Information Gain
     ig = clf.feature_importances_
     count = 0
-    selectedFeatures = list()
+    newselectedFeatures = list()
     for feature in clf.feature_importances_:
-        if feature > 0.1:
-            selectedFeatures.append(features[count])
-        count = count + 1
-
+       if feature > 0.1:
+           newselectedFeatures.append(selectedFeatures[count])
+       count = count + 1
 
     # Classification Model
     model_list = list()
     spec_list = list()
     f1_list = list()
 
-    features = selectedFeatures
+ #   features = selectedFeatures
+    features = newselectedFeatures
     dataCholan = data[data['Cholan'] == 1]
     dataNonCholan = data[data['Cholan'] == 0]
     cholan_test, cholan_smote = train_test_split(dataCholan,test_size = 0.7)
